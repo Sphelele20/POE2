@@ -5,23 +5,34 @@ namespace POE2
 {
     public class ActivityLogger
     {
-        private string logFilePath = "activity_log.txt";
+        private string logFile = "chatbot_log.txt";
 
-        public void LogActivity(string activity)
+        public void LogActivity(string message)
         {
-            string logEntry = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {activity}";
             try
             {
-                File.AppendAllText(logFilePath, logEntry + Environment.NewLine);
+                string logEntry = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} - {message}\n";
+                File.AppendAllText(logFile, logEntry);
             }
-            catch { }
+            catch (Exception ex)
+            {
+                // Handle logging errors silently
+                Console.WriteLine($"Logging error: {ex.Message}");
+            }
         }
 
-        public string ReadLog()
+        public string GetLogs()
         {
-            if (File.Exists(logFilePath))
-                return File.ReadAllText(logFilePath);
-            return "No activity logged yet.";
+            try
+            {
+                if (File.Exists(logFile))
+                    return File.ReadAllText(logFile);
+                return "No logs available.";
+            }
+            catch
+            {
+                return "Unable to read logs.";
+            }
         }
     }
 }

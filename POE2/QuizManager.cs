@@ -12,11 +12,11 @@ namespace POE2
             currentScore = 0;
             questions = new List<Question>
             {
-                new Question("What does 2FA stand for?", "Two-Factor Authentication", "A"),
-                new Question("Which is more secure for 2FA?", "Authenticator App", "A"),
-                new Question("Should you share your 2FA code?", "No, never share it", "B"),
-                new Question("What happens if someone gets your password but not 2FA code?", "They still cannot login", "A"),
-                new Question("Where should you store backup codes?", "Secure offline location", "A")
+                new Question("What does 2FA stand for?", "Two-Factor Authentication", "No, it's not 2FA", "A"),
+                new Question("Which is more secure for 2FA?", "Authenticator App", "SMS Code", "A"),
+                new Question("Should you share your 2FA code?", "No, never share it", "Yes, with friends", "A"),
+                new Question("What happens if someone gets your password but not 2FA code?", "They still cannot login", "They can login", "A"),
+                new Question("Where should you store backup codes?", "Secure offline location", "In your email", "A")
             };
         }
 
@@ -30,6 +30,12 @@ namespace POE2
                 quiz += $"B) {questions[i].OptionB}\n\n";
             }
             return quiz;
+        }
+
+        // ADD THIS MISSING METHOD
+        public string GetQuizQuestion()
+        {
+            return GetQuizQuestions();
         }
 
         public string CheckAnswers(string userAnswers)
@@ -47,11 +53,6 @@ namespace POE2
                    (currentScore >= 4 ? "Excellent cybersecurity knowledge!" : "Review 2FA safety tips and try again.");
         }
 
-        internal string GetQuizQuestion()
-        {
-            throw new NotImplementedException();
-        }
-
         private class Question
         {
             public string QuestionText { get; set; }
@@ -59,12 +60,13 @@ namespace POE2
             public string OptionB { get; set; }
             public string CorrectAnswer { get; set; }
 
-            public Question(string text, string a, string b)
+            // FIX THE CONSTRUCTOR - add correctAnswer parameter
+            public Question(string text, string optionA, string optionB, string correctAnswer)
             {
                 QuestionText = text;
-                OptionA = a;
-                OptionB = b;
-                CorrectAnswer = b;
+                OptionA = optionA;
+                OptionB = optionB;
+                CorrectAnswer = correctAnswer;
             }
         }
     }

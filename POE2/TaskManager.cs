@@ -29,9 +29,10 @@ namespace POE2
             return result;
         }
 
-        internal string GetSecurityTask()
+        // ADD THIS MISSING METHOD
+        public string GetSecurityTask()
         {
-            throw new NotImplementedException();
+            return GetAllTasks();
         }
     }
 }

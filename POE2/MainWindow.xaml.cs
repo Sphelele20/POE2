@@ -19,9 +19,14 @@ namespace POE2
             quiz = new QuizManager();
             logger = new ActivityLogger();
 
+            // This will now work
             TaskBox.Text = tasks.GetSecurityTask();
             QuizBox.Text = quiz.GetQuizQuestion();
             LoadLog();
+
+            // Add welcome message to chat
+            ChatBox.AppendText("Bot: Welcome to Cybersecurity Awareness Chatbot!\n");
+            ChatBox.AppendText("Bot: Ask me about passwords, phishing, malware, WiFi safety, or 2FA.\n\n");
         }
 
         private void Send_Click(object sender, RoutedEventArgs e)
@@ -56,6 +61,7 @@ namespace POE2
 
         private void ShowImages_Click(object sender, RoutedEventArgs e)
         {
+            // Refresh quiz question
             QuizBox.Text = quiz.GetQuizQuestion();
             MessageBox.Show("Switched to 2FA Quiz tab", "Info");
         }
