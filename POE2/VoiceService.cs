@@ -1,12 +1,14 @@
-﻿using System.Media;
+﻿using System;
 
-namespace SmartChat.Services
+namespace POE2
 {
-    public static class VoiceService
+    public class VoiceService
     {
-        public static void PlayGreeting()
+        // Basic version - returns demo text. For real voice use System.Speech.Recognition
+        public string Listen()
         {
-            SystemSounds.Beep.Play();
+            // TODO: Add System.Speech.Recognition later for POE marks
+            return "Voice input demo - type your question instead for now";
         }
     }
 }

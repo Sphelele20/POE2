@@ -1,147 +1,70 @@
-﻿using System;
-using System.Windows;
-using System.Windows.Controls;
+﻿using System.Windows;
 using System.Windows.Input;
-using System.Windows.Media;
-using SmartChat.Services;
-using SmartChat.Models;
+using System.IO;
 
-namespace SmartChat
+namespace POE2
 {
     public partial class MainWindow : Window
     {
-        private ChatbotEngine chatbot;
+        private ChatbotEngine bot;
+        private TaskManager tasks;
+        private QuizManager quiz;
+        private ActivityLogger logger;
 
         public MainWindow()
         {
             InitializeComponent();
-            chatbot = new ChatbotEngine();
-            InitializeChat();
+            bot = new ChatbotEngine();
+            tasks = new TaskManager();
+            quiz = new QuizManager();
+            logger = new ActivityLogger();
+
+            TaskBox.Text = tasks.GetSecurityTask();
+            QuizBox.Text = quiz.GetQuizQuestion();
+            LoadLog();
         }
 
-        private void InitializeComponent()
+        private void Send_Click(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
-        }
-
-        private void InitializeChat()
-        {
-            AddBotMessage("👋 Hello! I'm your Cybersecurity Awareness Assistant!");
-            AddBotMessage("");
-            AddBotMessage("I can help you with:");
-            AddBotMessage("  🔐 Password Safety");
-            AddBotMessage("  ⚠️ Scam Prevention");
-            AddBotMessage("  🔒 Privacy Protection");
-            AddBotMessage("  🛡️ Malware Defense");
-            AddBotMessage("  🔑 Two-Factor Authentication");
-            AddBotMessage("");
-            AddBotMessage("Type 'help' to see all commands!");
-            AddBotMessage("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-        }
-
-        private void BtnSend_Click(object sender, RoutedEventArgs e)
-        {
-            SendMessage();
-        }
-
-        private void TxtUserInput_KeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key == Key.Enter)
+            string userInput = InputBox.Text;
+            if (!string.IsNullOrWhiteSpace(userInput))
             {
-                SendMessage();
-                e.Handled = true;
+                ChatBox.AppendText($"You: {userInput}\n");
+                string reply = bot.GetResponse(userInput);
+                ChatBox.AppendText($"Bot: {reply}\n\n");
+                logger.LogActivity($"User: {userInput}");
+                InputBox.Clear();
+                ChatBox.ScrollToEnd();
+                LoadLog();
             }
         }
 
-        private void SendMessage()
+        private void InputBox_KeyDown(object sender, KeyEventArgs e)
         {
-            string userMessage = TxtUserInput.Text.Trim();
-            if (string.IsNullOrEmpty(userMessage))
-                return;
-
-            AddUserMessage(userMessage);
-            TxtUserInput.Clear();
-
-            var response = chatbot.GetResponse(userMessage);
-
-            if (response.IsImage)
-            {
-                AddBotMessage("🖼️ Cybersecurity Images");
-                AddBotMessage("🛡️ Shield: Protects your digital life");
-                AddBotMessage("🔐 Lock: Keeps your data secure");
-                AddBotMessage("⚠️ Warning: Stay vigilant online");
-            }
-            else
-            {
-                AddBotMessage(response.Message);
-            }
+            if (e.Key == Key.Enter) Send_Click(sender, e);
         }
 
-        private void AddUserMessage(string message)
+        private void Hello_Click(object sender, RoutedEventArgs e)
         {
-            var border = new Border
-            {
-                Background = new SolidColorBrush(Color.FromRgb(37, 99, 235)),
-                CornerRadius = new CornerRadius(15, 15, 5, 15),
-                Padding = new Thickness(12, 8, 12, 8),
-                Margin = new Thickness(150, 5, 10, 5),
-                HorizontalAlignment = HorizontalAlignment.Right
-            };
-
-            var textBlock = new TextBlock
-            {
-                Text = message,
-                Foreground = Brushes.White,
-                TextWrapping = TextWrapping.Wrap,
-                FontSize = 13,
-                MaxWidth = 400
-            };
-
-            border.Child = textBlock;
-            ChatPanel.Children.Add(border);
-            ScrollToBottom();
+            ChatBox.AppendText("Bot: Hello! Ask me about passwords, phishing, malware, or WiFi safety.\n\n");
         }
 
-        private void AddBotMessage(string message)
+        private void Clear_Click(object sender, RoutedEventArgs e)
         {
-            var border = new Border
-            {
-                Background = new SolidColorBrush(Color.FromRgb(30, 41, 59)),
-                CornerRadius = new CornerRadius(15, 15, 15, 5),
-                Padding = new Thickness(12, 8, 12, 8),
-                Margin = new Thickness(10, 5, 150, 5),
-                HorizontalAlignment = HorizontalAlignment.Left
-            };
-
-            var textBlock = new TextBlock
-            {
-                Text = message,
-                Foreground = Brushes.White,
-                TextWrapping = TextWrapping.Wrap,
-                FontSize = 13,
-                MaxWidth = 500
-            };
-
-            border.Child = textBlock;
-            ChatPanel.Children.Add(border);
-            ScrollToBottom();
+            ChatBox.Clear();
         }
 
-        private void BtnVoiceGreeting_Click(object sender, RoutedEventArgs e)
+        private void ShowImages_Click(object sender, RoutedEventArgs e)
         {
-            VoiceService.PlayGreeting();
-            AddBotMessage("🔊 Voice greeting played!");
+            QuizBox.Text = quiz.GetQuizQuestion();
+            MessageBox.Show("Switched to 2FA Quiz tab", "Info");
         }
 
-        private void BtnClearChat_Click(object sender, RoutedEventArgs e)
+        private void LoadLog()
         {
-            ChatPanel.Children.Clear();
-            InitializeChat();
-        }
-
-        private void ScrollToBottom()
-        {
-            ChatScrollViewer.ScrollToBottom();
+            string logFile = "chatbot_log.txt";
+            if (File.Exists(logFile))
+                LogBox.Text = File.ReadAllText(logFile);
         }
     }
 }

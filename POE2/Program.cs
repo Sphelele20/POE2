@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace CybersecurityChatbot
+namespace POE2
 {
     public partial class App : Application
     {
